@@ -1,0 +1,48 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+UserSettings/
+[Bb]uild/
+[Bb]uilds/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Local checks, screenshots and recoverable editor snapshots.
+/Verification/
+/revision-backup/
+/Screenshots/
+/.library-transfer/
+/.foundation-finalized
+/.minimal-revision-applied
+/.playable-map-revision-applied
+/.wall-revision-applied
+
+# Local credentials; example configuration can be shared.
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+
+# Generated IDE and operating-system files.
+.vs/
+.DS_Store
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+sysinfo.txt
+*.stackdump
+
+# Shared source consists of Assets and its .meta files, Packages,
+# ProjectSettings, README.md and this file. Local migration guards stay private.

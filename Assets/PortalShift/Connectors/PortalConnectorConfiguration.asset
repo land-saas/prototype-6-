@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836b0d913843c4501ad0e5744ba4bfdd, type: 3}
+  m_Name: PortalConnectorConfiguration
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::PortalShift.Editor.PortalConnectorConfiguration
+  Seed: 42606
+  Width: 2
+  Height: 2
+  Straight: {fileID: 7808034041068014645, guid: ee6bc21699a414ba2986ee6b0e2bfb9c, type: 3}
+  Corner: {fileID: 7567518940946381029, guid: a2e98216e02794a1b9e02d7815a2b5b0, type: 3}
+  TJunction: {fileID: 2586963719532665369, guid: 42963143168f745b9908686cc670d09f, type: 3}
+  MirrorPlatformVariants: 0
+  Gap: 0.6
+  ReferenceSnapshot: Verification/ConnectorSnapshots/20261013-062932-223/before-template-capture.unity
+  LastGeneratedScene: Assets/PortalShift/Connectors/Generated/PortalShift_2x2_Seed42606.unity
