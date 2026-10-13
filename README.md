@@ -4,6 +4,8 @@ Unity **6000.5.10f1** foundation and seeded connector-layout tools. Open **`Asse
 
 Source repository: [land-saas/prototype-6-](https://github.com/land-saas/prototype-6-).
 
+Rendering uses **URP 17.5.0 with the 2D Renderer** on Unity 6000.5.10f1. Graphics selects `Assets/PortalShift/Rendering/PortalShiftURP.asset`; all Quality levels inherit it. The shared `UnlitSprite.mat` retains its identity and uses `Universal Render Pipeline/2D/Sprite-Unlit-Default`, so the existing sprites need no lights. This replaces the deprecated Built-in renderer without moving scene objects. **Portal Shift → Repairs → Validate Sprite Rendering (Read Only)** checks the active pipeline, renderer resources and sprite material references.
+
 ## Play
 
 **A/D or Left/Right** move, **Space/W** jump, **E** interacts near a portal, **R** resets, and **M** switches whole-map/current-room views. Both views keep movement, physics, and interaction active. The default whole-map camera fits every room anchor; portal traversal does not snap it. The HUD has only zoom/reset icons. Portal one/two white dots show distance.
