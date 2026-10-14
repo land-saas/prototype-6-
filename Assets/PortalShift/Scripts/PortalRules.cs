@@ -23,8 +23,8 @@ namespace PortalShift
 
         public int Seed { get { return seed; } }
         public int Phase { get { return phase; } }
-        public int YellowDistance { get { return phase == 0 ? 1 : 2; } }
-        public int PurpleDistance { get { return phase == 0 ? 2 : 1; } }
+        public int YellowDistance { get { return 1; } }
+        public int PurpleDistance { get { return 2; } }
         public BoundaryPolicy BoundaryPolicy
         {
             get { return boundaryPolicy; }
@@ -156,7 +156,73 @@ namespace PortalShift
             }
 
             destination = candidate;
-            if (distance == 2) phase = 1 - phase;
+            reason = string.Empty;
+            return true;
+        }
+
+        public bool TryTraverse(Vector2Int from, CardinalDirection direction, PortalColor color, int width, int height, IReadOnlyCollection<Vector2Int> available, out Vector2Int destination, out string reason)
+        {
+            destination = from;
+
+            if (width <= 0 || height <= 0)
+            {
+                reason = "The room grid must have positive dimensions.";
+                return false;
+            }
+
+            if ((int)direction < 0 || (int)direction > 3 ||
+                !IsColor(color) || (phase != 0 && phase != 1))
+            {
+                reason = "The portal rules are invalid.";
+                return false;
+            }
+
+            if (boundaryPolicy != BoundaryPolicy.Reject &&
+                boundaryPolicy != BoundaryPolicy.Wrap)
+            {
+                reason = "The boundary policy is invalid.";
+                return false;
+            }
+
+            if (!InBounds(from, width, height))
+            {
+                reason = "The current room is outside the room grid.";
+                return false;
+            }
+
+            if (available == null || !HasRoom(available, from))
+            {
+                reason = "The current room is not registered.";
+                return false;
+            }
+
+            int distance = DistanceFor(color);
+            Vector2Int step = OffsetFor(direction);
+
+            long x = (long)from.x + step.x * distance;
+            long y = (long)from.y + step.y * distance;
+
+            if (boundaryPolicy == BoundaryPolicy.Wrap)
+            {
+                x = PositiveModulo(x, width);
+                y = PositiveModulo(y, height);
+            }
+            else if (x < 0 || y < 0 || x >= width || y >= height)
+            {
+                reason = "That portal leads beyond the current room grid.";
+                return false;
+            }
+
+            Vector2Int candidate = new Vector2Int((int)x, (int)y);
+
+            if (!HasRoom(available, candidate))
+            {
+                reason = "No room is registered at that destination.";
+                return false;
+            }
+
+            destination = candidate;
+
             reason = string.Empty;
             return true;
         }

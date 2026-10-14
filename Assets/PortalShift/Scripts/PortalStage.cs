@@ -85,16 +85,40 @@ namespace PortalShift
         }
         public void ResetAttempt()
         {
+            
             MapOpen = StartInWholeMap;
-            int seed = UseFixedSeed ? AttemptSeed : unchecked(Environment.TickCount ^ Guid.NewGuid().GetHashCode());
-            AttemptSeed = seed;
-            Rules = new PortalRuleState(seed) { BoundaryPolicy = Boundary };
+
+            // Create the direction rules only once.
+            // Keep the same rules when restarting.
+            if (Rules == null)
+            {
+                int seed = UseFixedSeed
+                    ? AttemptSeed
+                    : unchecked(Environment.TickCount ^ Guid.NewGuid().GetHashCode());
+
+                AttemptSeed = seed;
+
+                Rules = new PortalRuleState(seed)
+                {
+                    BoundaryPolicy = Boundary
+                };
+            }
+
+            // Randomize ONLY the visible portal shapes.
+            RandomizePortalShapes(
+                unchecked(Environment.TickCount ^ Guid.NewGuid().GetHashCode()));
+
             visited.Clear();
             TraversalCount = 0;
             nextInteraction = Time.unscaledTime + InteractionCooldown;
-            if (!roomMap.TryGetValue(StartCoordinate, out var start)) throw new InvalidOperationException("Start coordinate has no room.");
+
+            if (!roomMap.TryGetValue(StartCoordinate, out var start))
+                throw new InvalidOperationException(
+                    "Start coordinate has no room.");
+
             EnterRoom(start);
             RefreshPortals();
+
             Status = "";
             OnAttemptReset?.Invoke();
         }
@@ -105,7 +129,7 @@ namespace PortalShift
             nextInteraction = Time.unscaledTime + InteractionCooldown;
             Rules.BoundaryPolicy = Boundary;
             int oldPhase = Rules.Phase;
-            if (!Rules.TryTraverse(CurrentRoom.Coordinate, portal.Shape, portal.Color, Width, Height, roomMap.Keys, out var destination, out var reason))
+            if (!Rules.TryTraverse(CurrentRoom.Coordinate, portal.Direction, portal.Color, Width, Height, roomMap.Keys, out var destination, out var reason))
             {
                 Say("No chamber at that destination.");
                 return false;
@@ -177,6 +201,69 @@ namespace PortalShift
             Player.Teleport(CurrentRoom.SpawnPosition);
             Say("Back on solid ground.");
         }
+
+        void RandomizePortalShapes(int seed)
+        {
+            System.Random rng = new System.Random(seed);
+
+            // Start with all four shapes.
+            PortalShape[] shapes =
+            {
+                PortalShape.Triangle,
+                PortalShape.Diamond,
+                PortalShape.Rectangle,
+                PortalShape.Hexagon
+            };
+
+            // Shuffle the shapes once per attempt.
+            for (int i = shapes.Length - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+
+                PortalShape temp = shapes[i];
+                shapes[i] = shapes[j];
+                shapes[j] = temp;
+            }
+
+            // Each direction gets exactly one shape.
+            PortalShape leftShape = shapes[0];
+            PortalShape rightShape = shapes[1];
+            PortalShape upShape = shapes[2];
+            PortalShape downShape = shapes[3];
+
+            // Apply the same shape to every portal with that direction.
+            foreach (var room in Rooms)
+            {
+                if (room == null)
+                    continue;
+
+                var portals = room.GetComponentsInChildren<ShiftPortal>(true);
+
+                foreach (var portal in portals)
+                {
+                    switch (portal.Direction)
+                    {
+                        case CardinalDirection.Left:
+                            portal.Shape = leftShape;
+                            break;
+
+                        case CardinalDirection.Right:
+                            portal.Shape = rightShape;
+                            break;
+
+                        case CardinalDirection.Up:
+                            portal.Shape = upShape;
+                            break;
+
+                        case CardinalDirection.Down:
+                            portal.Shape = downShape;
+                            break;
+                    }
+                }
+            }
+        }
+
+
         void RefreshPortals()
         {
             foreach (var room in Rooms)
