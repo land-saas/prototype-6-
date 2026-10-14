@@ -37,13 +37,12 @@ The current user reference retains:
 | Ceiling Step 1 | (2, -0.275) |
 | Ceiling Step 2 | (0, 1.5) |
 | Ceiling Step 3 | Deleted |
-| Yellow Rectangle | Y = 5.15, Mount = Ceiling |
 
-**The Rectangle is explicitly above the solid ceiling and inaccessible from the room interior.** Capture and generation preserve that placement. For default preview seed 42606, Rectangle is the rightward portal, so the player starting in the left column cannot reach the right column. The default preview therefore does not provide a playable route through all four rooms. Fixing access requires an explicit layout decision.
+The authored scene preserves the user's newer, distinct portal artwork placements in each room. Connector templates retain their own existing artwork layouts, including their above-ceiling Rectangle. Template connectivity does not establish physical access or a complete playable route.
 
 Expand a room root, select a platform parent rather than its `Landing Edge`, and edit **Transform → Position X/Y** or **Scale X/Y**. **Cmd+D** duplicates its collider, effector, and artwork. One-way ledges retain BoxCollider2D **Is Trigger off**, **Used By Effector on**, and PlatformEffector2D **Use One Way on**. Floor/walls remain solid. No Unity Layer changes are needed. Save with **Cmd+S outside Play**.
 
-Move the entire portal parent; preserve its trigger and Shape Renderer, Wall Attachment, Distance Pips, and Shape Sprites references. `Mount` controls physical cue placement; `VisualRotationDegrees` rotates artwork. Neither assigns logical direction or automatically relocates/resizes the trigger. Original checkerboard colors remain three yellow/one purple: Triangle purple on even coordinate parity, Diamond purple on odd parity. Manual platform edits and existing crew scripts survive capture.
+Preserve the trigger and Shape Renderer, Wall Attachment, Distance Pips, and Shape Sprites references when editing portals. Interaction follows the visible Shape child without resizing the trigger. **Repairs → Align Portal Triggers and Distance Cues** explicitly places both white dots in front of the actual artwork, on the room-facing side inferred from its attachment, with visible sorting. It snapshots first and preserves gate artwork and geometry. Refresh, phase changes and reset only toggle dot visibility; they never reposition the authored dots. `VisualRotationDegrees` rotates artwork independently of logical direction. Original checkerboard colors remain three yellow/one purple: Triangle purple on even coordinate parity, Diamond purple on odd parity.
 
 ## Rules, checks, and source handoff
 
@@ -51,6 +50,6 @@ Shapes map bijectively to cardinal directions once per attempt and remain stable
 
 Use **Portal Shift → Run Rule Checks**, **Run Connector Checks**, and **Connectors → Run Connector Integration Checks**. The integration command generates and reopens separate saved 2×2 and 4×4 scenes using seeds 42606 and 42607, and verifies that the active reference, selection and persistent configuration stay unchanged.
 
-Unity 6000.5.10f1 passed **2,366 automated connector assertions**, covering 16 seeded topologies and 480 logical portal graphs. The current reference passed **165 structural assertions**; the first generated 2×2 scene passed **171**. These checks inspect geometry, references and logical reachability without simulating physics. Four above-ceiling Rectangle access warnings are retained. Saved-scene integration and fresh runtime results are pending. Earlier 152-check results and screenshots precede the current reference and do not verify it; geometry-based route helpers also require a fresh run.
+The alignment repair on Unity 6000.5.10f1 passed **49 portal validations**, **67 isolated alignment assertions**, **358 rule assertions**, and **28 automated Play Mode checks**. The Play checks exercise real movement, grounding/jump, safe arrivals, cooldown, reset and dot stability. Interaction probes use scripted positioning and direct interaction calls with a disclosed runtime-only seed; they do not establish human keyboard traversal or full puzzle solvability. Rerun these through **Repairs → Validate Portal Alignment (Read Only)**, **Run Portal Alignment Checks**, and **Run Live Portal Alignment Play Mode Checks**. Local reports describe their scope.
 
 **Build Mac Preview** validates/builds the saved authored scene without regeneration; it does not automatically select a generated connector scene. Keep Assets/`.meta`, Packages, and ProjectSettings together. Verification reports, snapshots, and screenshots remain local and ignored; no screenshot or Library image upload is part of this source handoff. Do not run historical migration helpers after crew edits.

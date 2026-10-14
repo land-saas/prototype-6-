@@ -26,10 +26,27 @@ namespace PortalShift
         public Color PurpleTint = new Color(.74f, .49f, 1f);
         BoxCollider2D trigger;
         public PortalRoom Room => GetComponentInParent<PortalRoom>();
+        void Awake() => AlignInteractionToArtwork();
+
+        /// <summary>
+        /// Moving the Shape child in the editor moves the visible portal. Keep
+        /// its upright interaction box centered there without moving any artwork,
+        /// attachment, distance cue, or changing the authored trigger size.
+        /// </summary>
+        public void AlignInteractionToArtwork()
+        {
+            if (trigger == null) trigger = GetComponent<BoxCollider2D>();
+            if (trigger == null || ShapeRenderer == null) return;
+            Vector3 center = transform.InverseTransformPoint(ShapeRenderer.transform.position);
+            Vector2 offset = new Vector2(center.x, center.y);
+            if ((trigger.offset - offset).sqrMagnitude > .00000001f) trigger.offset = offset;
+        }
+
         public bool CanInteract(PortalPlayerController player)
         {
             if (!isActiveAndEnabled || player == null) return false;
-            if (trigger == null) trigger = GetComponent<BoxCollider2D>();
+            AlignInteractionToArtwork();
+            if (trigger == null) return false;
             return trigger.bounds.SqrDistance(player.transform.position) <= InteractionReach * InteractionReach;
         }
         public void Refresh(PortalRuleState rules)
@@ -43,21 +60,14 @@ namespace PortalShift
             UpdatePips(rules.DistanceFor(Color));
             if (WallAttachment != null) WallAttachment.color = Color == PortalColor.Yellow ? YellowTint : PurpleTint;
             if (ShapeRenderer != null) ShapeRenderer.transform.localRotation = Quaternion.Euler(0,0,VisualRotationDegrees);
+            AlignInteractionToArtwork();
         }
         void UpdatePips(int distance)
         {
             if (DistancePips == null) return;
             for (int i=0;i<DistancePips.Length;i++)
                 if (DistancePips[i] != null)
-                {
                     DistancePips[i].enabled = i < distance;
-                    float spread = distance==1?0:(i==0?-.09f:.09f);
-                    Vector2 offset = Mount==PortalMount.Left?new Vector2(.6f,spread):
-                        Mount==PortalMount.Right?new Vector2(-.6f,spread):
-                        Mount==PortalMount.Floor?new Vector2(spread,.6f):
-                        Mount==PortalMount.Ceiling?new Vector2(spread,-.6f):new Vector2(spread,-.89f);
-                    DistancePips[i].transform.localPosition = new Vector3(offset.x,offset.y,-.1f);
-                }
         }
         void OnValidate()
         {
